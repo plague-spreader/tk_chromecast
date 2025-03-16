@@ -1,0 +1,563 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.4" author="PygubuDesigner 0.39.3">
+  <project>
+    <settings>
+      <setting id="name">Chromecast</setting>
+      <setting id="description">Chromecast</setting>
+      <setting id="module_name">chromecast</setting>
+      <setting id="template">application</setting>
+      <setting id="main_widget">notebook4</setting>
+      <setting id="main_classname">Chromecast</setting>
+      <setting id="main_menu" />
+      <setting id="output_dir" />
+      <setting id="output_dir2" />
+      <setting id="import_tkvariables">False</setting>
+      <setting id="use_ttk_styledefinition_file">False</setting>
+      <setting id="use_i18n">False</setting>
+      <setting id="all_ids_attributes">False</setting>
+      <setting id="generate_code_onsave">False</setting>
+      <setting id="use_window_centering_code">False</setting>
+      <setting id="ttk_style_definition_file" />
+    </settings>
+    <customwidgets />
+  </project>
+  <object class="ttk.Notebook" id="notebook4">
+    <property name="height">600</property>
+    <property name="title" translatable="yes">tk_chromecast</property>
+    <property name="width">800</property>
+    <layout manager="pack">
+      <property name="expand">true</property>
+      <property name="fill">both</property>
+      <property name="side">top</property>
+    </layout>
+    <child>
+      <object class="ttk.Notebook.Tab" id="tab1">
+        <property name="text" translatable="yes">Player</property>
+        <child>
+          <object class="ttk.Frame" id="frame7">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Frame" id="frame14">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="expand">false</property>
+                  <property name="fill">x</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="tk.Button" id="btnToggleMute" named="True">
+                    <property name="command" type="command" cbtype="simple">player_toggle_mute</property>
+                    <property name="relief">raised</property>
+                    <property name="text" translatable="yes">🔇</property>
+                    <layout manager="pack">
+                      <property name="expand">false</property>
+                      <property name="fill">y</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Scale" id="sliderVolume" named="True">
+                    <property name="label" translatable="yes">Volume control</property>
+                    <property name="orient">horizontal</property>
+                    <bind sequence="&lt;ButtonRelease&gt;" handler="volume_change" add="" />
+                    <bind sequence="&lt;KeyRelease&gt;" handler="volume_change" add="" />
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">x</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame1">
+                <property name="height">20</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="tk.Button" id="btnPrev" named="True">
+                    <property name="command" type="command" cbtype="simple">player_prev</property>
+                    <property name="text" translatable="yes">⏮</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Button" id="btnPlayPause" named="True">
+                    <property name="command" type="command" cbtype="simple">player_play_pause</property>
+                    <property name="text" translatable="yes">⏸</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Button" id="btnStop" named="True">
+                    <property name="command" type="command" cbtype="simple">player_stop</property>
+                    <property name="text" translatable="yes">⏹</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Button" id="btnNext" named="True">
+                    <property name="command" type="command" cbtype="simple">player_next</property>
+                    <property name="text" translatable="yes">⏭</property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame5">
+                <property name="height">20</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="fill">x</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Label" id="label5">
+                    <property name="text" translatable="yes">Currently playing: </property>
+                    <layout manager="pack">
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Label" id="lblCurrentlyPlaying" named="True">
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">x</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame9">
+                <property name="height">20</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame11">
+                <property name="height">20</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="fill">x</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="tk.Scale" id="sliderSeekTime" named="True">
+                    <property name="label" translatable="yes">Seek time</property>
+                    <property name="orient">horizontal</property>
+                    <bind sequence="&lt;ButtonRelease&gt;" handler="seek_time_change" add="" />
+                    <bind sequence="&lt;KeyRelease&gt;" handler="seek_time_change" add="" />
+                    <layout manager="pack">
+                      <property name="fill">x</property>
+                      <property name="side">top</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame12">
+                <property name="height">20</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Frame" id="frame13">
+                <property name="height">20</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="ttk.Notebook.Tab" id="tab2">
+        <property name="text" translatable="yes">Add music</property>
+        <child>
+          <object class="ttk.Frame" id="frame8">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="ttk.Labelframe" id="labelframe1">
+                <property name="height">200</property>
+                <property name="text" translatable="yes">Local music</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="anchor">n</property>
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="ttk.Labelframe" id="labelframe2">
+                    <property name="height">200</property>
+                    <property name="text" translatable="yes">HTTP server binding information</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="fill">x</property>
+                      <property name="side">top</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Frame" id="frame2">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout manager="pack">
+                          <property name="anchor">n</property>
+                          <property name="expand">false</property>
+                          <property name="fill">x</property>
+                          <property name="side">top</property>
+                        </layout>
+                        <child>
+                          <object class="ttk.Label" id="label2">
+                            <property name="text" translatable="yes">Directory: </property>
+                            <layout manager="pack">
+                              <property name="anchor">w</property>
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Entry" id="txtHttpDir" named="True">
+                            <property name="state">readonly</property>
+                            <layout manager="pack">
+                              <property name="anchor">w</property>
+                              <property name="expand">true</property>
+                              <property name="fill">x</property>
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Button" id="btnBrowse" named="True">
+                            <property name="command" type="command" cbtype="simple">browse_fileserver_dir</property>
+                            <property name="text" translatable="yes">Browse...</property>
+                            <layout manager="pack">
+                              <property name="anchor">n</property>
+                              <property name="side">right</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Frame" id="frame16">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout manager="pack">
+                          <property name="expand">false</property>
+                          <property name="fill">x</property>
+                          <property name="side">top</property>
+                        </layout>
+                        <child>
+                          <object class="ttk.Frame" id="frame18">
+                            <property name="height">200</property>
+                            <property name="width">200</property>
+                            <layout manager="pack">
+                              <property name="fill">x</property>
+                              <property name="side">top</property>
+                            </layout>
+                            <child>
+                              <object class="tk.Label" id="label4">
+                                <property name="text" translatable="yes">Host: </property>
+                                <layout manager="pack">
+                                  <property name="side">left</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="tk.Entry" id="txtHttpHost" named="True">
+                                <layout manager="pack">
+                                  <property name="side">left</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="tk.Entry" id="txtHttpPort" named="True">
+                                <property name="text" translatable="yes">8000</property>
+                                <layout manager="pack">
+                                  <property name="fill">x</property>
+                                  <property name="side">right</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="tk.Label" id="label6">
+                                <property name="text" translatable="yes">Port: </property>
+                                <layout manager="pack">
+                                  <property name="side">right</property>
+                                </layout>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Frame" id="frame20">
+                            <property name="height">200</property>
+                            <property name="width">200</property>
+                            <layout manager="pack">
+                              <property name="fill">x</property>
+                              <property name="side">top</property>
+                            </layout>
+                            <child>
+                              <object class="ttk.Button" id="btnCreateHttpServer" named="True">
+                                <property name="command" type="command" cbtype="simple">create_stop_http_server</property>
+                                <property name="text" translatable="yes">Create HTTP server</property>
+                                <layout manager="pack">
+                                  <property name="expand">true</property>
+                                  <property name="fill">x</property>
+                                  <property name="side">left</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="ttk.Button" id="btnConnectHttpServer" named="True">
+                                <property name="command" type="command" cbtype="simple">connect_http_server</property>
+                                <property name="text" translatable="yes">Connect to HTTP server</property>
+                                <layout manager="pack">
+                                  <property name="expand">true</property>
+                                  <property name="fill">x</property>
+                                  <property name="side">left</property>
+                                </layout>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Frame" id="frame6">
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="anchor">n</property>
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="side">bottom</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Label" id="label3">
+                        <property name="text" translatable="yes">Directory files:</property>
+                        <layout manager="pack">
+                          <property name="expand">false</property>
+                          <property name="pady">5</property>
+                          <property name="side">top</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Listbox" id="listLocalFiles" named="True">
+                        <property name="selectmode">single</property>
+                        <layout manager="pack">
+                          <property name="anchor">w</property>
+                          <property name="expand">true</property>
+                          <property name="fill">both</property>
+                          <property name="side">top</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Frame" id="frame17">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout manager="pack">
+                          <property name="expand">false</property>
+                          <property name="fill">x</property>
+                          <property name="side">top</property>
+                        </layout>
+                        <child>
+                          <object class="ttk.Button" id="btnPlayLocally" named="True">
+                            <property name="command" type="command" cbtype="simple">play_local_song</property>
+                            <property name="text" translatable="yes">Play directory song</property>
+                            <layout manager="pack">
+                              <property name="anchor">s</property>
+                              <property name="expand">true</property>
+                              <property name="fill">x</property>
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Button" id="btnEnqueueLocally" named="True">
+                            <property name="command" type="command" cbtype="simple">enqueue_local_song</property>
+                            <property name="text" translatable="yes">Enqueue directory song</property>
+                            <layout manager="pack">
+                              <property name="expand">true</property>
+                              <property name="fill">x</property>
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Labelframe" id="labelframe3">
+                <property name="height">200</property>
+                <property name="text" translatable="yes">Youtube</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="fill">x</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="tk.Frame" id="frame3">
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="anchor">nw</property>
+                      <property name="expand">false</property>
+                      <property name="fill">x</property>
+                      <property name="side">top</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Label" id="label1">
+                        <property name="takefocus">false</property>
+                        <property name="text" translatable="yes">Youtube URL video: </property>
+                        <layout manager="pack">
+                          <property name="anchor">nw</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="txtYtUrl" named="True">
+                        <layout manager="pack">
+                          <property name="anchor">nw</property>
+                          <property name="expand">true</property>
+                          <property name="fill">x</property>
+                          <property name="side">right</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Frame" id="frame10">
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="anchor">s</property>
+                      <property name="expand">true</property>
+                      <property name="fill">x</property>
+                      <property name="side">bottom</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="btnYTPlay" named="True">
+                        <property name="command" type="command" cbtype="simple">play_yt_url</property>
+                        <property name="text" translatable="yes">Play Youtube song</property>
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">x</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Button" id="btnYTQueue" named="True">
+                        <property name="command" type="command" cbtype="simple">enqueue_yt_url</property>
+                        <property name="text" translatable="yes">Enqueue Youtube song</property>
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">x</property>
+                          <property name="side">right</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="tk.Toplevel" id="toplevel1">
+    <property name="height">600</property>
+    <property name="title" translatable="yes">Select the Chromecast and close this window</property>
+    <property name="width">800</property>
+    <child>
+      <object class="ttk.Frame" id="frame15">
+        <property name="height">600</property>
+        <property name="width">800</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">both</property>
+          <property name="side">top</property>
+        </layout>
+        <child>
+          <object class="ttk.Label" id="label7">
+            <property name="text" translatable="yes">Select the desired chromecast (double-click on the list or click the button below) and close this window</property>
+            <layout manager="pack">
+              <property name="expand">false</property>
+              <property name="fill">x</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Treeview" id="listChromecasts" named="True">
+            <property name="selectmode">browse</property>
+            <property name="show">headings</property>
+            <bind sequence="&lt;Double-Button-1&gt;" handler="select_chromecast" add="" />
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Button" id="btnSelectChromecast" named="True">
+            <property name="command" type="command" cbtype="simple">select_chromecast</property>
+            <property name="text" translatable="yes">Select Chromecast</property>
+            <layout manager="pack">
+              <property name="expand">false</property>
+              <property name="fill">x</property>
+              <property name="side">top</property>
+            </layout>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
