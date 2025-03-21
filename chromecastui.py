@@ -19,6 +19,8 @@ import http.server
 import socketserver
 import socket
 
+import smbclient
+
 
 PROJECT_PATH = pathlib.Path(__file__).parent
 PROJECT_UI = PROJECT_PATH / "gui.ui"
@@ -186,6 +188,11 @@ class ChromecastUI:
         list_local_files: tk.Listbox = self.ui.listLocalFiles
         list_local_files.delete(0, "end")
         list_local_files.insert(0, *tree.xpath("//ul/li/a/@href"))
+
+    def connect_smb_server(self, event=None):
+        # TODO what happens if someone connects to both an http and smb server?
+
+        ...
 
     def _get_list_local_selection(self):
         index = self.ui.listLocalFiles.curselection()

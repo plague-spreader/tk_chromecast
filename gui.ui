@@ -361,6 +361,105 @@
                   </object>
                 </child>
                 <child>
+                  <object class="ttk.Labelframe" id="labelframe5">
+                    <property name="height">50</property>
+                    <property name="text" translatable="yes">Samba server connection</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="side">top</property>
+                    </layout>
+                    <child>
+                      <object class="ttk.Frame" id="frame4">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">x</property>
+                          <property name="side">top</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Label" id="label8">
+                            <property name="font">TkDefaultFont</property>
+                            <property name="text" translatable="yes">URL: </property>
+                            <layout manager="pack">
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="txtSambaUrl" named="True">
+                            <property name="text" translatable="yes">\\&lt;IP server&gt;\&lt;path&gt;</property>
+                            <layout manager="pack">
+                              <property name="expand">true</property>
+                              <property name="fill">x</property>
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Frame" id="frame19">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">x</property>
+                          <property name="side">top</property>
+                        </layout>
+                        <child>
+                          <object class="tk.Label" id="label9">
+                            <property name="text" translatable="yes">Username: </property>
+                            <layout manager="pack">
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="txtUsername" named="True">
+                            <layout manager="pack">
+                              <property name="expand">true</property>
+                              <property name="fill">x</property>
+                              <property name="side">left</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Entry" id="txtPassword" named="True">
+                            <property name="show">*</property>
+                            <layout manager="pack">
+                              <property name="expand">true</property>
+                              <property name="fill">x</property>
+                              <property name="side">right</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Label" id="label11">
+                            <property name="text" translatable="yes">Password: </property>
+                            <layout manager="pack">
+                              <property name="side">right</property>
+                            </layout>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Button" id="btnConnectSamba" named="True">
+                        <property name="command" type="command" cbtype="simple">connect_smb_server</property>
+                        <property name="text" translatable="yes">Connect to Samba server</property>
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">x</property>
+                          <property name="side">top</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
                   <object class="ttk.Frame" id="frame6">
                     <property name="height">200</property>
                     <property name="width">200</property>
@@ -405,7 +504,6 @@
                             <property name="command" type="command" cbtype="simple">play_local_song</property>
                             <property name="text" translatable="yes">Play directory song</property>
                             <layout manager="pack">
-                              <property name="anchor">s</property>
                               <property name="expand">true</property>
                               <property name="fill">x</property>
                               <property name="side">left</property>

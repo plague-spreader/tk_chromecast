@@ -2,3 +2,4 @@ pygubu
 pychromecast
 yt_dlp
 lxml
+smbprotocol
