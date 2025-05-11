@@ -218,15 +218,32 @@ class ChromecastUI:
         self._exec_deferred_jobs()
 
     @staticmethod
-    def get_audio_url(info_obj):
+    def get_audio_url(info_obj) -> (bool, str):
         best_audio_quality = float("-inf")
         best_audio_url = None
+        protocol = None
         for _format in info_obj["formats"]:
-            if "acodec" in _format and _format["acodec"] != "none" and (
-                    "vcodec" not in _format or _format["vcodec"] == "none"):
-                if _format["quality"] > best_audio_quality:
-                    best_audio_url = _format["url"]
-        return best_audio_url
+            if yt_dlp.YoutubeDL.format_resolution(_format) != "audio only":
+                continue
+
+            format_id = int(_format["format_id"])
+            if format_id > best_audio_quality:
+                best_audio_quality = format_id
+                best_audio_url = _format["url"]
+                protocol = _format["protocol"]
+
+        return (protocol.startswith("m3u8"), best_audio_url)
+
+    @staticmethod
+    def handle_m3u8_url(url: str) -> list[str]:
+        urls = []
+        lines = requests.get(url).text.split("\n")
+        for line in lines:
+            if line.startswith("#"):
+                continue
+            if line.startswith("https://") or line.startswith("http://"):
+                urls.append(line)
+        return urls
 
     def _get_yt_url(self):
         url = self.ui.txtYtUrl.get()
@@ -235,8 +252,21 @@ class ChromecastUI:
     def play_yt_url(self, event=None):
         url, info_obj = self._get_yt_url()
         title = info_obj["title"]
-        self._mc.play_media(ChromecastUI.get_audio_url(info_obj), "audio/mp3",
-                            title=title)
+        m3u8_url, audio_url = ChromecastUI.get_audio_url(info_obj)
+        if m3u8_url:
+            audio_urls = ChromecastUI.handle_m3u8_url(audio_url)
+            first_url = True
+            for audio_url in audio_urls:
+                if first_url:
+                    first_url = False
+                    self._mc.play_media(audio_url, "audio/mp3", title=title)
+                else:
+                    self._mc.play_media(audio_url, "audio/mp3",
+                                    title=info_obj["title"], enqueue=True,
+                                    autoplay=True)
+        else:
+            self._mc.play_media(audio_url, "audio/mp3", title=title)
+
         self._exec_deferred_jobs()
 
     def enqueue_yt_url(self, event=None):
