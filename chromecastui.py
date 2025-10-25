@@ -203,6 +203,9 @@ class ChromecastUI:
         self._mc.play_media(url, "audio/mp3", title=selection)
         self._exec_deferred_jobs()
 
+    def play_local_song_(self, event=None):
+        self.play_local_song(event)
+
     def enqueue_local_song(self, event=None):
         selection = self._get_list_local_selection()
         if selection is None:
