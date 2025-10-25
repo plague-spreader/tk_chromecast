@@ -383,6 +383,7 @@
                     <child>
                       <object class="tk.Listbox" id="listLocalFiles" named="True">
                         <property name="selectmode">single</property>
+                        <bind sequence="&lt;Double-Button-1&gt;" handler="play_local_song_" add="" />
                         <layout manager="pack">
                           <property name="anchor">w</property>
                           <property name="expand">true</property>
@@ -538,7 +539,7 @@
           <object class="ttk.Treeview" id="listChromecasts" named="True">
             <property name="selectmode">browse</property>
             <property name="show">headings</property>
-            <bind sequence="&lt;Double-Button-1&gt;" handler="select_chromecast" add="" />
+            <bind sequence="&lt;Double-Button-1&gt;" handler="select_chromecast_and_quit" add="" />
             <layout manager="pack">
               <property name="expand">true</property>
               <property name="fill">both</property>
