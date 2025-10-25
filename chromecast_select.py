@@ -45,3 +45,7 @@ class SelectChromecast:
             cast_index = int(cast_index[0][1:]) - 1
             self.selected_cast = self._casts[cast_index]
             print("Selected chromecast:", self.selected_cast)
+
+    def select_chromecast_and_quit(self, event=None):
+         self.select_chromecast(event)
+         self.mainwindow.destroy()
