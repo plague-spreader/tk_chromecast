@@ -2,6 +2,7 @@
 
 from tkinter import filedialog
 from views import toggle_button
+from net import get_default_ip
 
 from threading import Thread
 
@@ -122,7 +123,7 @@ class ChromecastUI:
 
     def create_stop_http_server(self, event=None):
         directory = self.ui.txtHttpDir.get()
-        host = self.ui.txtHttpHost.get()
+        host = self.ui.txtHttpHost.get() or get_default_ip()
         port = self.ui.txtHttpPort.get()
 
         if not directory:
@@ -163,12 +164,8 @@ class ChromecastUI:
         self.ui.btnCreateHttpServer.config(text=text)
 
     def connect_http_server(self, event=None):
-        host = self.ui.txtHttpHost.get()
+        host = self.ui.txtHttpHost.get() or get_default_ip()
         port = self.ui.txtHttpPort.get()
-
-        if not host:
-            tk.messagebox.showerror("Error", "Host cannot be empty")
-            return
 
         if not port:
             tk.messagebox.showerror("Error", "Port cannot be empty")
