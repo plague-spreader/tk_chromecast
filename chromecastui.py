@@ -114,7 +114,7 @@ class ChromecastUI:
             self._http_server.stop()
 
     def browse_fileserver_dir(self, event=None):
-        directory = filedialog.askdirectory()
+        directory = filedialog.askdirectory(initialdir="~/Music")
         txt = self.ui.txtHttpDir
         txt.config(state="normal")
         txt.delete(0, tk.END)

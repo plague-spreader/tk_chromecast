@@ -307,7 +307,7 @@
                             </child>
                             <child>
                               <object class="tk.Entry" id="txtHttpPort" named="True">
-                                <property name="text" translatable="yes">8000</property>
+                                <property name="text" translatable="yes">1321</property>
                                 <layout manager="pack">
                                   <property name="fill">x</property>
                                   <property name="side">right</property>
