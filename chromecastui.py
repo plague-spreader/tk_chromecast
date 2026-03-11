@@ -247,12 +247,19 @@ class ChromecastUI:
 
     def _get_yt_url(self):
         url = self.ui.txtYtUrl.get()
+        if "youtube.com" not in url:
+            return url, None
         return url, self._yt.extract_info(url, download=False, process=False)
 
     def play_yt_url(self, event=None):
         url, info_obj = self._get_yt_url()
+        if info_obj is None:
+            # non e' un video di youtube
+            self._mc.play_media(url, "audio/mp3")
         title = info_obj["title"]
         m3u8_url, audio_url = ChromecastUI.get_audio_url(info_obj)
+        print("m3u8_url =", m3u8_url)
+        print("audio_url =", audio_url)
         if m3u8_url:
             audio_urls = ChromecastUI.handle_m3u8_url(audio_url)
             first_url = True
