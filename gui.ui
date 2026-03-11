@@ -53,7 +53,7 @@
                   <object class="tk.Button" id="btnToggleMute" named="True">
                     <property name="command" type="command" cbtype="simple">player_toggle_mute</property>
                     <property name="relief">raised</property>
-                    <property name="text" translatable="yes">🔇</property>
+                    <property name="text" translatable="yes">muto</property>
                     <layout manager="pack">
                       <property name="expand">false</property>
                       <property name="fill">y</property>
@@ -86,7 +86,7 @@
                 <child>
                   <object class="tk.Button" id="btnPrev" named="True">
                     <property name="command" type="command" cbtype="simple">player_prev</property>
-                    <property name="text" translatable="yes">⏮</property>
+                    <property name="text" translatable="yes">prev</property>
                     <layout manager="pack">
                       <property name="side">left</property>
                     </layout>
@@ -95,7 +95,7 @@
                 <child>
                   <object class="tk.Button" id="btnPlayPause" named="True">
                     <property name="command" type="command" cbtype="simple">player_play_pause</property>
-                    <property name="text" translatable="yes">⏸</property>
+                    <property name="text" translatable="yes">pausa</property>
                     <layout manager="pack">
                       <property name="side">left</property>
                     </layout>
@@ -104,7 +104,7 @@
                 <child>
                   <object class="tk.Button" id="btnStop" named="True">
                     <property name="command" type="command" cbtype="simple">player_stop</property>
-                    <property name="text" translatable="yes">⏹</property>
+                    <property name="text" translatable="yes">stop</property>
                     <layout manager="pack">
                       <property name="side">left</property>
                     </layout>
@@ -113,7 +113,7 @@
                 <child>
                   <object class="tk.Button" id="btnNext" named="True">
                     <property name="command" type="command" cbtype="simple">player_next</property>
-                    <property name="text" translatable="yes">⏭</property>
+                    <property name="text" translatable="yes">next</property>
                     <layout manager="pack">
                       <property name="side">left</property>
                     </layout>
