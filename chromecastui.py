@@ -217,6 +217,22 @@ class ChromecastUI:
                             autoplay=False)
         self._exec_deferred_jobs()
 
+    def get_playlist_urls_titles(self, url) -> list[dict[str, str]]:
+        ret = []
+        playlist_entries = self._yt.extract_info(url,
+                                                 download=False,
+                                                 process=True)
+        playlist_entries = playlist_entries["entries"]
+        for playlist_entry in playlist_entries:
+            try:
+                playlist_info_obj = {"title": playlist_entry["title"]}
+                _, playlist_info_obj["url"] =\
+                    ChromecastUI.get_audio_url(playlist_entry)
+                ret.append(playlist_info_obj)
+            except yt_dlp.utils.DownloadError:
+                continue
+        return ret
+
     @staticmethod
     def get_audio_url(info_obj) -> (bool, str):
         best_audio_quality = float("-inf")
@@ -252,14 +268,33 @@ class ChromecastUI:
             return url, None
         return url, self._yt.extract_info(url, download=False, process=False)
 
-    def _handle_yt_url(self, **enqueue_kwargs):
-        url, info_obj = self._get_yt_url()
+    def _handle_yt_url(self, url, info_obj, **enqueue_kwargs):
         if info_obj is None:
             # non e' un video di youtube
             self._mc.play_media(url, "audio/mp3", **enqueue_kwargs)
             return
 
         title = info_obj["title"]
+        if "url" in info_obj and "/playlist?list=" in info_obj["url"]:
+            # gestione playlist
+            try:
+                playlist_song_infos = self.get_playlist_urls_titles(url)
+                for playlist_song_info in playlist_song_infos:
+                    enqueue_kwargs["title"] = (f'{title} - '
+                                            f'{playlist_song_info["title"]}')
+                    try:
+                        self._mc.play_media(playlist_song_info["url"],
+                                            "audio/mp3", **enqueue_kwargs)
+                    except yt_dlp.utils.DownloadError:
+                        continue
+                    enqueue_kwargs.update(enqueue=True, autoplay=True)
+            except yt_dlp.utils.DownloadError:
+                tk.messagebox.showerror(
+                    "Chromecast",
+                    "Some videos in the playlist are unavailable. Aborting."
+                )
+            return
+
         m3u8_url, audio_url = ChromecastUI.get_audio_url(info_obj)
         if m3u8_url:
             audio_urls = ChromecastUI.handle_m3u8_url(audio_url)
@@ -277,11 +312,15 @@ class ChromecastUI:
 
         self._exec_deferred_jobs()
 
+    def _handle_and_get_yt_url(self, **enqueue_kwargs):
+        url, info_obj = self._get_yt_url()
+        self._handle_yt_url(url, info_obj, **enqueue_kwargs)
+
     def play_yt_url(self, event=None):
-        self._handle_yt_url()
+        self._handle_and_get_yt_url()
 
     def enqueue_yt_url(self, event=None):
-        self._handle_yt_url(enqueue=True, autoplay=True)
+        self._handle_and_get_yt_url(enqueue=True, autoplay=True)
 
     def player_toggle_mute(self, event=None):
         mute = not self._cast.status.volume_muted
