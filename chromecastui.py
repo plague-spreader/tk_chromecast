@@ -6,6 +6,7 @@ from net import get_default_ip
 
 from threading import Thread
 
+from pprint import pprint
 from lxml import html
 
 import tkinter.ttk as ttk
@@ -19,6 +20,7 @@ import yt_dlp
 import http.server
 import socketserver
 import socket
+import traceback
 
 
 PROJECT_PATH = pathlib.Path(__file__).parent
@@ -58,6 +60,7 @@ class UI:
         for ui_element in ui_elements:
             setattr(self, ui_element, builder.get_object(ui_element))
 
+
 class ChromecastUI:
     def __init__(self, master, cast):
         self.master = master
@@ -79,11 +82,11 @@ class ChromecastUI:
         self.deferred_jobs: list[Thread] = []
         self._http_server = None
         self.directory = None
-        self._yt = yt_dlp.YoutubeDL()
+        self._yt = yt_dlp.YoutubeDL({"ignoreerrors": True})
         self._yt.params["quiet"] = True
         self._cast: pychromecast.Chromecast = cast
         self._mc: pychromecast.controllers.media.MediaController =\
-                cast.media_controller
+            cast.media_controller
 
         self._get_current_cast_status()
         self._status_listener = MyListener(self)
@@ -135,7 +138,7 @@ class ChromecastUI:
             return
 
         call_stop = self._http_server is not None and\
-                self._http_server.is_alive()
+            self._http_server.is_alive()
 
         if not call_stop:
             try:
@@ -225,6 +228,9 @@ class ChromecastUI:
         playlist_entries = playlist_entries["entries"]
         for playlist_entry in playlist_entries:
             try:
+                if playlist_entry is None:
+                    # unavailable video in playlist
+                    continue
                 playlist_info_obj = {"title": playlist_entry["title"]}
                 _, playlist_info_obj["url"] =\
                     ChromecastUI.get_audio_url(playlist_entry)
@@ -237,7 +243,7 @@ class ChromecastUI:
     def get_audio_url(info_obj) -> (bool, str):
         best_audio_quality = float("-inf")
         best_audio_url = None
-        #protocol = None
+        # protocol = None
         for _format in info_obj["formats"]:
             if yt_dlp.YoutubeDL.format_resolution(_format) != "audio only":
                 continue
@@ -246,9 +252,9 @@ class ChromecastUI:
             if format_id > best_audio_quality:
                 best_audio_quality = format_id
                 best_audio_url = _format["url"]
-                #protocol = _format["protocol"]
+                # protocol = _format["protocol"]
 
-        #return (protocol.startswith("m3u8"), best_audio_url)
+        # return (protocol.startswith("m3u8"), best_audio_url)
         return (False, best_audio_url)
 
     @staticmethod
@@ -281,7 +287,8 @@ class ChromecastUI:
                 playlist_song_infos = self.get_playlist_urls_titles(url)
                 for playlist_song_info in playlist_song_infos:
                     enqueue_kwargs["title"] = (f'{title} - '
-                                            f'{playlist_song_info["title"]}')
+                                               f'{playlist_song_info["title"]}'
+                                               )
                     try:
                         self._mc.play_media(playlist_song_info["url"],
                                             "audio/mp3", **enqueue_kwargs)
@@ -293,6 +300,7 @@ class ChromecastUI:
                     "Chromecast",
                     "Some videos in the playlist are unavailable. Aborting."
                 )
+                traceback.print_exc()
             return
 
         m3u8_url, audio_url = ChromecastUI.get_audio_url(info_obj)
@@ -302,13 +310,15 @@ class ChromecastUI:
             for audio_url in audio_urls:
                 if first_url:
                     first_url = False
-                    self._mc.play_media(audio_url, "audio/mp3", title=title, **enqueue_kwargs)
+                    self._mc.play_media(audio_url, "audio/mp3", title=title,
+                                        **enqueue_kwargs)
                 else:
                     self._mc.play_media(audio_url, "audio/mp3",
-                                    title=info_obj["title"], enqueue=True,
-                                    autoplay=True)
+                                        title=info_obj["title"], enqueue=True,
+                                        autoplay=True)
         else:
-            self._mc.play_media(audio_url, "audio/mp3", title=title, **enqueue_kwargs)
+            self._mc.play_media(audio_url, "audio/mp3", title=title,
+                                **enqueue_kwargs)
 
         self._exec_deferred_jobs()
 
