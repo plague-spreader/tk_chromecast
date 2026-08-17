@@ -12,6 +12,7 @@ from lxml import html
 import tkinter.ttk as ttk
 import tkinter as tk
 import pychromecast
+import urllib.parse
 import requests
 import pathlib
 import pygubu
@@ -30,6 +31,13 @@ RESOURCE_PATHS = [PROJECT_PATH]
 def is_port_in_use(port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) == 0
+
+
+def local_files(quoted_urls: list[str]):
+    unquoted_urls = []
+    for q_url in quoted_urls:
+        unquoted_urls.append(urllib.parse.unquote(q_url))
+    return quoted_urls, unquoted_urls
 
 
 class HttpServer(Thread):
@@ -84,14 +92,16 @@ class ChromecastUI:
         self.directory = None
         self._yt = yt_dlp.YoutubeDL({"ignoreerrors": True})
         self._yt.params["quiet"] = True
-        self._cast: pychromecast.Chromecast = cast
-        self._mc: pychromecast.controllers.media.MediaController =\
-            cast.media_controller
+        self._cast = None
+        if cast:
+            self._cast: pychromecast.Chromecast = cast
+            self._mc: pychromecast.controllers.media.MediaController =\
+                cast.media_controller
 
-        self._get_current_cast_status()
-        self._status_listener = MyListener(self)
-        self._cast.register_status_listener(self._status_listener)
-        self._mc.register_status_listener(self._status_listener)
+            self._get_current_cast_status()
+            self._status_listener = MyListener(self)
+            self._cast.register_status_listener(self._status_listener)
+            self._mc.register_status_listener(self._status_listener)
 
     def run(self):
         self.mainwindow.mainloop()
@@ -185,7 +195,8 @@ class ChromecastUI:
 
         list_local_files: tk.Listbox = self.ui.listLocalFiles
         list_local_files.delete(0, "end")
-        list_local_files.insert(0, *tree.xpath("//ul/li/a/@href"))
+        self._q_urls, self._u_urls = local_files(tree.xpath("//ul/li/a/@href"))
+        list_local_files.insert(0, *self._u_urls)
 
     def _get_list_local_selection(self):
         index = self.ui.listLocalFiles.curselection()
@@ -194,7 +205,7 @@ class ChromecastUI:
         except IndexError:
             return None
 
-        return self.ui.listLocalFiles.get(index)
+        return self._q_urls[index]
 
     def play_local_song(self, event=None):
         selection = self._get_list_local_selection()
@@ -203,8 +214,11 @@ class ChromecastUI:
 
         url = self.http_base_url + selection
 
-        self._mc.play_media(url, "audio/mp3", title=selection)
-        self._exec_deferred_jobs()
+        if self._cast:
+            self._mc.play_media(url, "audio/mp3", title=selection)
+            self._exec_deferred_jobs()
+        else:
+            print(f'Playing "{url}"')
 
     def play_local_song_(self, event=None):
         self.play_local_song(event)
@@ -399,5 +413,5 @@ class MyListener:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = ChromecastUI(root)
+    app = ChromecastUI(root, None)
     app.run()
