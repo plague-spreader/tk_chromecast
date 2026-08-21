@@ -371,29 +371,70 @@
                       <property name="side">bottom</property>
                     </layout>
                     <child>
-                      <object class="ttk.Label" id="label3">
-                        <property name="text" translatable="yes">Directory files:</property>
+                      <object class="ttk.Frame" id="frame4">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
                         <layout manager="pack">
                           <property name="expand">false</property>
-                          <property name="pady">5</property>
+                          <property name="fill">x</property>
                           <property name="side">top</property>
                         </layout>
+                        <child>
+                          <object class="ttk.Entry" id="txtSearch" named="True">
+                            <property name="textvariable">string:search_text</property>
+                            <layout manager="pack">
+                              <property name="side">right</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="ttk.Label" id="label3">
+                            <property name="text" translatable="yes">Search:</property>
+                            <layout manager="pack">
+                              <property name="expand">false</property>
+                              <property name="padx">5</property>
+                              <property name="pady">5</property>
+                              <property name="side">right</property>
+                            </layout>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
-                      <object class="tk.Listbox" id="listLocalFiles" named="True">
-                        <property name="selectmode">single</property>
-                        <bind sequence="&lt;Double-Button-1&gt;" handler="play_local_song_" add="" />
+                      <object class="ttk.Frame" id="frame17">
+                        <property name="height">200</property>
+                        <property name="width">200</property>
                         <layout manager="pack">
                           <property name="anchor">w</property>
                           <property name="expand">true</property>
                           <property name="fill">both</property>
                           <property name="side">top</property>
                         </layout>
+                        <child>
+                          <object class="ttk.Label" id="label8">
+                            <property name="text" translatable="yes">Directory files:</property>
+                            <layout manager="pack">
+                              <property name="pady">5</property>
+                              <property name="side">top</property>
+                            </layout>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="tk.Listbox" id="listLocalFiles" named="True">
+                            <property name="selectmode">single</property>
+                            <bind sequence="&lt;Double-Button-1&gt;" handler="play_local_song_" add="" />
+                            <layout manager="pack">
+                              <property name="anchor">w</property>
+                              <property name="expand">true</property>
+                              <property name="fill">both</property>
+                              <property name="side">top</property>
+                            </layout>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
-                      <object class="ttk.Frame" id="frame17">
+                      <object class="ttk.Frame" id="frame19">
                         <property name="height">200</property>
                         <property name="width">200</property>
                         <layout manager="pack">

@@ -92,6 +92,8 @@ class ChromecastUI:
         self.directory = None
         self._yt = yt_dlp.YoutubeDL({"ignoreerrors": True})
         self._yt.params["quiet"] = True
+        self.search_var = self.builder.get_variable("search_text")
+        self.search_var.trace_add("write", self.on_search_changed)
         self._cast = None
         if cast:
             self._cast: pychromecast.Chromecast = cast
@@ -102,6 +104,21 @@ class ChromecastUI:
             self._status_listener = MyListener(self)
             self._cast.register_status_listener(self._status_listener)
             self._mc.register_status_listener(self._status_listener)
+
+    def on_search_changed(self, var_name, index, mode):
+        search_text = self.search_var.get()
+        self._qf_urls, filtered_u_urls = self._q_urls, self._u_urls
+
+        if search_text:
+            self._qf_urls, filtered_u_urls = [], []
+            for i, unquoted_url in enumerate(self._u_urls):
+                if search_text.lower() in unquoted_url.lower():
+                    filtered_u_urls.append(unquoted_url)
+                    self._qf_urls.append(self._q_urls[i])
+
+        list_local_files: tk.Listbox = self.ui.listLocalFiles
+        list_local_files.delete(0, "end")
+        list_local_files.insert(0, *filtered_u_urls)
 
     def run(self):
         self.mainwindow.mainloop()
@@ -193,29 +210,27 @@ class ChromecastUI:
                                     f"Cannot connect to {self.http_base_url}")
             return
 
-        list_local_files: tk.Listbox = self.ui.listLocalFiles
-        list_local_files.delete(0, "end")
         self._q_urls, self._u_urls = local_files(tree.xpath("//ul/li/a/@href"))
-        list_local_files.insert(0, *self._u_urls)
+        self.on_search_changed(None, None, None)
 
     def _get_list_local_selection(self):
         index = self.ui.listLocalFiles.curselection()
         try:
             index = index[0]
         except IndexError:
-            return None
+            return None, None
 
-        return self._q_urls[index]
+        return self._qf_urls[index], self._u_urls[index]
 
     def play_local_song(self, event=None):
-        selection = self._get_list_local_selection()
+        selection, unquoted_selection = self._get_list_local_selection()
         if selection is None:
             return
 
         url = self.http_base_url + selection
 
         if self._cast:
-            self._mc.play_media(url, "audio/mp3", title=selection)
+            self._mc.play_media(url, "audio/mp3", title=unquoted_selection)
             self._exec_deferred_jobs()
         else:
             print(f'Playing "{url}"')
@@ -224,14 +239,14 @@ class ChromecastUI:
         self.play_local_song(event)
 
     def enqueue_local_song(self, event=None):
-        selection = self._get_list_local_selection()
+        selection, unquoted_selection = self._get_list_local_selection()
         if selection is None:
             return
 
         url = self.http_base_url + selection
 
-        self._mc.play_media(url, "audio/mp3", title=selection, enqueue=True,
-                            autoplay=False)
+        self._mc.play_media(url, "audio/mp3", title=unquoted_selection,
+                            enqueue=True, autoplay=False)
         self._exec_deferred_jobs()
 
     def get_playlist_urls_titles(self, url) -> list[dict[str, str]]:
