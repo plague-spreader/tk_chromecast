@@ -107,18 +107,18 @@ class ChromecastUI:
 
     def on_search_changed(self, var_name, index, mode):
         search_text = self.search_var.get()
-        self._qf_urls, filtered_u_urls = self._q_urls, self._u_urls
+        self._qf_urls, self._uf_urls = self._q_urls, self._u_urls
 
         if search_text:
-            self._qf_urls, filtered_u_urls = [], []
+            self._qf_urls, self._uf_urls = [], []
             for i, unquoted_url in enumerate(self._u_urls):
                 if search_text.lower() in unquoted_url.lower():
-                    filtered_u_urls.append(unquoted_url)
+                    self._uf_urls.append(unquoted_url)
                     self._qf_urls.append(self._q_urls[i])
 
         list_local_files: tk.Listbox = self.ui.listLocalFiles
         list_local_files.delete(0, "end")
-        list_local_files.insert(0, *filtered_u_urls)
+        list_local_files.insert(0, *self._uf_urls)
 
     def run(self):
         self.mainwindow.mainloop()
@@ -220,7 +220,7 @@ class ChromecastUI:
         except IndexError:
             return None, None
 
-        return self._qf_urls[index], self._u_urls[index]
+        return self._qf_urls[index], self._uf_urls[index]
 
     def play_local_song(self, event=None):
         selection, unquoted_selection = self._get_list_local_selection()
