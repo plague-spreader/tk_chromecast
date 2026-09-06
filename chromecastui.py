@@ -245,9 +245,12 @@ class ChromecastUI:
 
         url = self.http_base_url + selection
 
-        self._mc.play_media(url, "audio/mp3", title=unquoted_selection,
-                            enqueue=True, autoplay=False)
-        self._exec_deferred_jobs()
+        if self._cast:
+            self._mc.play_media(url, "audio/mp3", title=unquoted_selection,
+                                enqueue=True, autoplay=False)
+            self._exec_deferred_jobs()
+        else:
+            print(f'Enqueueing "{url}"')
 
     def get_playlist_urls_titles(self, url) -> list[dict[str, str]]:
         ret = []
