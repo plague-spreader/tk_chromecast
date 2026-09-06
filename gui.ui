@@ -186,6 +186,14 @@
                 <layout manager="pack">
                   <property name="side">top</property>
                 </layout>
+                <child>
+                  <object class="ttk.Label" id="label9">
+                    <property name="text" translatable="yes">Queue:</property>
+                    <layout manager="pack">
+                      <property name="side">top</property>
+                    </layout>
+                  </object>
+                </child>
               </object>
             </child>
             <child>
@@ -193,8 +201,19 @@
                 <property name="height">20</property>
                 <property name="width">200</property>
                 <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
                   <property name="side">top</property>
                 </layout>
+                <child>
+                  <object class="tk.Listbox" id="listQueue" named="True">
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="side">top</property>
+                    </layout>
+                  </object>
+                </child>
               </object>
             </child>
           </object>

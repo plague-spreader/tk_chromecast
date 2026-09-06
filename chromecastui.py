@@ -40,6 +40,15 @@ def local_files(quoted_urls: list[str]):
     return quoted_urls, unquoted_urls
 
 
+def add_tree_view(list_obj, element, clear_list=False):
+    if clear_list:
+        try:
+            list_obj.delete(0, "end")
+        except tk.TclError:
+            pass  # this happens when tree_view_obj is empty
+    list_obj.insert("end", element)
+
+
 class HttpServer(Thread):
     def __init__(self, bind_host, bind_port, directory, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -84,7 +93,7 @@ class ChromecastUI:
                      "btnCreateHttpServer", "txtHttpDir", "txtHttpHost",
                      "txtHttpPort", "txtYtUrl", "btnToggleMute",
                      "sliderVolume", "lblCurrentlyPlaying", "btnPlayPause",
-                     "sliderSeekTime", "listLocalFiles")
+                     "sliderSeekTime", "listLocalFiles", "listQueue")
 
         # business logic
         self.deferred_jobs: list[Thread] = []
@@ -229,6 +238,7 @@ class ChromecastUI:
 
         url = self.http_base_url + selection
 
+        add_tree_view(self.ui.listQueue, unquoted_selection, True)
         if self._cast:
             self._mc.play_media(url, "audio/mp3", title=unquoted_selection)
             self._exec_deferred_jobs()
@@ -245,6 +255,7 @@ class ChromecastUI:
 
         url = self.http_base_url + selection
 
+        add_tree_view(self.ui.listQueue, unquoted_selection)
         if self._cast:
             self._mc.play_media(url, "audio/mp3", title=unquoted_selection,
                                 enqueue=True, autoplay=False)
