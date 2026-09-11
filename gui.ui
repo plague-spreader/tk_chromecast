@@ -53,7 +53,7 @@
                   <object class="tk.Button" id="btnToggleMute" named="True">
                     <property name="command" type="command" cbtype="simple">player_toggle_mute</property>
                     <property name="relief">raised</property>
-                    <property name="text" translatable="yes">muto</property>
+                    <property name="text" translatable="yes">mute</property>
                     <layout manager="pack">
                       <property name="expand">false</property>
                       <property name="fill">y</property>
@@ -95,7 +95,7 @@
                 <child>
                   <object class="tk.Button" id="btnPlayPause" named="True">
                     <property name="command" type="command" cbtype="simple">player_play_pause</property>
-                    <property name="text" translatable="yes">pausa</property>
+                    <property name="text" translatable="yes">pause</property>
                     <layout manager="pack">
                       <property name="side">left</property>
                     </layout>
@@ -493,7 +493,7 @@
             <child>
               <object class="ttk.Labelframe" id="labelframe3">
                 <property name="height">200</property>
-                <property name="text" translatable="yes">Youtube</property>
+                <property name="text" translatable="yes">On-line music</property>
                 <property name="width">200</property>
                 <layout manager="pack">
                   <property name="fill">x</property>
@@ -512,7 +512,7 @@
                     <child>
                       <object class="tk.Label" id="label1">
                         <property name="takefocus">false</property>
-                        <property name="text" translatable="yes">Youtube URL video: </property>
+                        <property name="text" translatable="yes">URL:</property>
                         <layout manager="pack">
                           <property name="anchor">nw</property>
                           <property name="side">left</property>
@@ -544,7 +544,7 @@
                     <child>
                       <object class="tk.Button" id="btnYTPlay" named="True">
                         <property name="command" type="command" cbtype="simple">play_yt_url</property>
-                        <property name="text" translatable="yes">Play Youtube song</property>
+                        <property name="text" translatable="yes">Play URL song</property>
                         <layout manager="pack">
                           <property name="expand">true</property>
                           <property name="fill">x</property>
@@ -555,7 +555,7 @@
                     <child>
                       <object class="tk.Button" id="btnYTQueue" named="True">
                         <property name="command" type="command" cbtype="simple">enqueue_yt_url</property>
-                        <property name="text" translatable="yes">Enqueue Youtube song</property>
+                        <property name="text" translatable="yes">Enqueue URL song</property>
                         <layout manager="pack">
                           <property name="expand">true</property>
                           <property name="fill">x</property>
