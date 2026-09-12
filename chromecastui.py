@@ -7,6 +7,7 @@ from net import get_default_ip
 from threading import Thread
 
 from pprint import pprint
+from IPython import embed
 from lxml import html
 
 import tkinter.ttk as ttk
@@ -17,6 +18,7 @@ import requests
 import pathlib
 import pygubu
 import yt_dlp
+import sys
 
 import http.server
 import socketserver
@@ -85,8 +87,9 @@ class ChromecastUI:
         self.builder.add_resource_paths(RESOURCE_PATHS)
         self.builder.add_from_file(PROJECT_UI)
         # Main widget
-        self.mainwindow: ttk.Notebook = self.builder.get_object(
-            "notebook4", master)
+        self.mainwindow = self.builder.get_object("toplevel2", master)
+        menu = self.builder.get_object("menu", master)
+        self.mainwindow.configure(menu=menu)
         self.builder.connect_callbacks(self)
 
         self.ui = UI(self.builder,
@@ -144,6 +147,14 @@ class ChromecastUI:
 
         self.ui.sliderVolume.set(int(self._cast.status.volume_level*100))
         self.ui.sliderSeekTime.set(self._mc.status.current_time)
+
+    def activate_debug(self, event=None):
+        if sys.stdout.isatty():
+            embed()
+        else:
+            tk.messagebox.showwarning("Cannot activate debug console",
+                                      ("Re-run the application in the "
+                                       "terminal to activate debugging"))
 
     def disconnect(self):
         self._cast.disconnect()

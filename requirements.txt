@@ -1,3 +1,4 @@
+ipython
 pygubu
 pychromecast
 yt_dlp
