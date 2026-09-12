@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd "$(dirname $(realpath $0))"
+
 if [ -d .venv ]; then
     source .venv/bin/activate
 else
