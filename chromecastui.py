@@ -6,6 +6,7 @@ from net import get_default_ip
 
 from threading import Thread
 
+from typing import Optional
 from pprint import pprint
 from IPython import embed
 from lxml import html
@@ -18,6 +19,8 @@ import requests
 import pathlib
 import pygubu
 import yt_dlp
+import errno
+import time
 import sys
 
 import http.server
@@ -42,12 +45,20 @@ def local_files(quoted_urls: list[str]):
     return quoted_urls, unquoted_urls
 
 
-def add_tree_view(list_obj, element, clear_list=False):
-    if clear_list:
+def clear_list(list_obj):
+    list_obj.delete(0, "end")
+
+
+def delete_from_list(list_obj, index):
+    list_obj.delete(index)
+
+
+def add_to_list(list_obj, element, do_clear_list=False):
+    if do_clear_list:
         try:
-            list_obj.delete(0, "end")
+            clear_list(list_obj)
         except tk.TclError:
-            pass  # this happens when tree_view_obj is empty
+            pass  # this happens when list_obj is empty
     list_obj.insert("end", element)
 
 
@@ -99,6 +110,9 @@ class ChromecastUI:
                      "sliderSeekTime", "listLocalFiles", "listQueue")
 
         # business logic
+        self._item_ids: list[int] = []
+        self._list_queue_index: Optional[int] = None
+        self._list_queue: list[tuple[str, str]] = []
         self.deferred_jobs: list[Thread] = []
         self._http_server = None
         self.directory = None
@@ -233,7 +247,125 @@ class ChromecastUI:
         self._q_urls, self._u_urls = local_files(tree.xpath("//ul/li/a/@href"))
         self.on_search_changed(None, None, None)
 
-    def _get_list_local_selection(self):
+    def async_send_message(self, *, callback_function=None, **kwargs):
+        if kwargs == {}:
+            raise ValueError("async_send_message: Empty kwargs")
+
+        msg = dict(**kwargs)
+        self._mc.send_message(msg, callback_function=callback_function)
+
+    def async_send_media_message(self, *, callback_function=None, **kwargs):
+        if self._mc.status.player_state == "IDLE":
+            raise RuntimeError("async_send_media_message: "
+                               "Chromecast must be playing something")
+
+        self.async_send_message(mediaSessionId=self._mc.status.media_session_id,
+                                callback_function=callback_function,
+                                **kwargs)
+
+    def send_message(self, *, timeout=10, **kwargs):
+        if kwargs == {}:
+            raise ValueError("send_message: Empty kwargs")
+
+        ret = ()
+
+        def inner_callback(msg_sent, response):
+            nonlocal ret
+            ret = (msg_sent, response)
+
+        msg = dict(**kwargs)
+        self._mc.send_message(msg, callback_function=inner_callback)
+
+        elapsed_time = 0
+        while not ret and elapsed_time < timeout:
+            time.sleep(1)
+            elapsed_time += 1
+
+        if elapsed_time >= timeout:
+            raise TimeoutError(errno.ETIMEDOUT,
+                               (f"send_message: Timed out: timeout={timeout}, "
+                                f"elapsed_time={elapsed_time}"))
+
+        return ret
+
+    def send_media_message(self, *, timeout=10, **kwargs):
+        if self._mc.status.player_state == "IDLE":
+            raise RuntimeError("send_media_message: "
+                               "Chromecast must be playing something")
+
+        return self.send_message(timeout=timeout,
+                                 mediaSessionId=self._mc.status.media_session_id,
+                                 **kwargs)
+
+    def _play_callback(self, msg_sent, response):
+        status = response["status"][0]
+        try:
+            self._item_ids = []
+            for item in status["items"]:
+                self._item_ids.append(item["itemId"])
+        except KeyError:
+            self._item_ids = [status["currentItemId"]]
+
+    def _do_play_local_song(self, url_path, title, enqueue):
+        url = self.http_base_url + url_path
+
+        if not enqueue:
+            self.ui.lblCurrentlyPlaying.config(text=title)
+
+        if self._cast:
+            self._mc.play_media(url,
+                                "audio/mp3",
+                                title=title,
+                                enqueue=enqueue,
+                                autoplay=not enqueue,
+                                callback_function=self._play_callback)
+            self._exec_deferred_jobs()
+        else:
+            if enqueue:
+                print(f'Enqueueing "{url}"')
+            else:
+                print(f'Playing "{url}"')
+
+    def _get_list_queue_song(self) -> tuple[str, str]:
+        index = self.ui.listQueue.curselection()
+        try:
+            index = index[0]
+        except IndexError:
+            return None, None
+
+        self._list_queue_index = index
+        return self._list_queue[index]
+
+    def play_from_queue(self, event=None):
+        url_path, title = self._get_list_queue_song()
+        self._do_play_local_song(url_path, title, False)
+
+    def remove_from_queue(self, event=None):
+        index = self.ui.listQueue.curselection()
+        try:
+            index = index[0]
+        except IndexError:
+            return
+
+        item_id = self._item_ids[index]
+        self.async_send_media_message(type="QUEUE_REMOVE", itemIds=[item_id])
+        delete_from_list(self.ui.listQueue, index)
+        del self._item_ids[index]
+        del self._list_queue[index]
+
+        try:
+            assert self._item_ids == self._list_queue
+        except AssertionError as e:
+            tk.messagebox.showerror(
+                "Chromecast",
+                "self._item_ids != self._list_queue. Why?"
+            )
+            raise e
+
+        if self._item_ids == []:
+            self.player_stop(event)
+
+    def _get_list_local_song_selection(self):
         index = self.ui.listLocalFiles.curselection()
         try:
             index = index[0]
@@ -242,37 +374,45 @@ class ChromecastUI:
 
         return self._qf_urls[index], self._uf_urls[index]
 
+    def set_queue_index(self, index):
+        old_index = self._list_queue_index
+        if old_index is None:
+            old_index = 0
+
+        self.ui.listQueue.selection_set(index)
+        if old_index != index:
+            self.ui.listQueue.selection_clear(old_index)
+        self._list_queue_index = index
+
+    def reset_queue_index(self):
+        self.ui.listQueue.selection_set(self._list_queue_index)
+
     def play_local_song(self, event=None):
-        selection, unquoted_selection = self._get_list_local_selection()
+        selection, unquoted_selection = self._get_list_local_song_selection()
         if selection is None:
             return
 
-        url = self.http_base_url + selection
-
-        add_tree_view(self.ui.listQueue, unquoted_selection, True)
-        if self._cast:
-            self._mc.play_media(url, "audio/mp3", title=unquoted_selection)
-            self._exec_deferred_jobs()
-        else:
-            print(f'Playing "{url}"')
+        self._list_queue = [(selection, unquoted_selection)]
+        add_to_list(self.ui.listQueue, unquoted_selection, True)
+        self.set_queue_index(0)
+        self._do_play_local_song(selection, unquoted_selection, False)
 
     def play_local_song_(self, event=None):
         self.play_local_song(event)
 
     def enqueue_local_song(self, event=None):
-        selection, unquoted_selection = self._get_list_local_selection()
+        selection, unquoted_selection = self._get_list_local_song_selection()
         if selection is None:
             return
 
-        url = self.http_base_url + selection
+        if self._mc.status.player_state in ("IDLE", "UNKNOWN"):
+            self.play_local_song(event)
+            return
 
-        add_tree_view(self.ui.listQueue, unquoted_selection)
-        if self._cast:
-            self._mc.play_media(url, "audio/mp3", title=unquoted_selection,
-                                enqueue=True, autoplay=False)
-            self._exec_deferred_jobs()
-        else:
-            print(f'Enqueueing "{url}"')
+        self._list_queue.append((selection, unquoted_selection))
+        add_to_list(self.ui.listQueue, unquoted_selection)
+        self.reset_queue_index()
+        self._do_play_local_song(selection, unquoted_selection, True)
 
     def get_playlist_urls_titles(self, url) -> list[dict[str, str]]:
         ret = []
@@ -410,21 +550,37 @@ class ChromecastUI:
             self._mc.play()
             toggle_button(False, self.ui.btnPlayPause)
         else:
-            # TODO che faccio qua?
-            pass
+            tk.messagebox.showerror(
+                "Chromecast: player_play_pause",
+                f"Unexpected status {self._mc._status.player_state}"
+            )
         self._exec_deferred_jobs()
 
     def player_stop(self, event=None):
+        clear_list(self.ui.listQueue)
+        self.ui.lblCurrentlyPlaying.config(text="")
         self._mc.stop()
         self._exec_deferred_jobs()
 
     def player_prev(self, event=None):
+        if self._list_queue_index == 0:
+            return
+
         self._mc.queue_prev()
         self._exec_deferred_jobs()
+        self.set_queue_index(self._list_queue_index - 1)
+        _, title = self._get_list_queue_song()
+        self.ui.lblCurrentlyPlaying.config(text=title)
 
     def player_next(self, event=None):
+        if self._list_queue_index == len(self._list_queue) - 1:
+            return
+
         self._mc.queue_next()
         self._exec_deferred_jobs()
+        self.set_queue_index(self._list_queue_index + 1)
+        _, title = self._get_list_queue_song()
+        self.ui.lblCurrentlyPlaying.config(text=title)
 
 
 class MyListener:
@@ -446,9 +602,10 @@ class MyListener:
                    kwargs={"to": status.duration}),
             Thread(target=self.ui.sliderSeekTime.set,
                    args=(status.current_time,)),
-            Thread(target=self.ui.lblCurrentlyPlaying.config,
-                   kwargs={"text": status.title})
             ))
+            #Thread(target=self.ui.lblCurrentlyPlaying.config,
+            #       kwargs={"text": status.title})
+            #))
 
 
 if __name__ == "__main__":
