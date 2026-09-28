@@ -18,6 +18,7 @@ import urllib.parse
 import requests
 import pathlib
 import pygubu
+import socket
 import yt_dlp
 import errno
 import time
@@ -99,6 +100,7 @@ class ChromecastUI:
         self.builder.add_from_file(PROJECT_UI)
         # Main widget
         self.mainwindow = self.builder.get_object("toplevel2", master)
+        self.mainwindow.client(socket.gethostname())
         menu = self.builder.get_object("menu", master)
         self.mainwindow.configure(menu=menu)
         self.builder.connect_callbacks(self)

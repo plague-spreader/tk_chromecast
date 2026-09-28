@@ -3,6 +3,7 @@ from views import SelectChromecastView
 import pychromecast
 import pathlib
 import pygubu
+import socket
 
 PROJECT_PATH = pathlib.Path(__file__).parent
 PROJECT_UI = PROJECT_PATH / "gui.ui"
@@ -17,6 +18,7 @@ class SelectChromecast:
         self.builder.add_from_file(PROJECT_UI)
         # Main widget
         self.mainwindow = self.builder.get_object("toplevel1", master)
+        self.mainwindow.client(socket.gethostname())
         self.builder.connect_callbacks(self)
 
         self.listChromecasts = self.builder.get_object("listChromecasts")
